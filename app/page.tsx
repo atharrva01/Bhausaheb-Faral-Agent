@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { SHIPPING_RATES, SUPPORTED_COUNTRIES, FREE_SHIPPING_THRESHOLD_CENTS } from "@/lib/shipping";
 import { formatUSD } from "@/lib/money";
 import { ProductCard } from "@/components/shop/ProductCard";
+import { OpenChatButton } from "@/components/chat/OpenChatButton";
 
 // Stock changes with every order, so always render at request time.
 export const dynamic = "force-dynamic";
@@ -38,13 +39,21 @@ export default async function ShopPage() {
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-sm text-cream/80">
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <OpenChatButton className="rounded-full bg-turmeric px-5 py-2.5 font-semibold text-ink shadow hover:brightness-105">
+              Order by chatting with Aai&apos;s assistant
+            </OpenChatButton>
+            <a href="#faral" className="rounded-full border border-cream/40 px-5 py-2.5 font-semibold hover:bg-cream/10">
+              Browse faral
+            </a>
+          </div>
+          <p className="mt-4 text-sm text-cream/80">
             Free shipping over {formatUSD(FREE_SHIPPING_THRESHOLD_CENTS)} · Pay in USD with PayPal
           </p>
         </div>
       </header>
 
-      <section className="mx-auto max-w-6xl px-4 py-8 pb-28 sm:py-10">
+      <section id="faral" className="mx-auto max-w-6xl scroll-mt-16 px-4 py-8 pb-28 sm:py-10">
         <h2 className="font-display text-2xl text-maroon sm:text-3xl">This Diwali&apos;s faral</h2>
         <p className="mt-1 text-muted">Made fresh in small batches by Aai. Prices are per pack.</p>
         <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">

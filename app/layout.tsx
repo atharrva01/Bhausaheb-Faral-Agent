@@ -3,6 +3,7 @@ import { Mukta, Rozha_One } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { SiteNav } from "@/components/layout/SiteNav";
+import { ChatPanel } from "@/components/chat/ChatPanel";
 
 // Both fonts cover Latin + Devanagari, so Marathi names render properly.
 const mukta = Mukta({
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Providers>
           <SiteNav />
           {children}
+          <ChatPanel />
         </Providers>
       </body>
     </html>
