@@ -1,0 +1,131 @@
+// Bhausaheb Faral Agent: data model (PRD Section 7, rev 2)
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Product {
+  id            String      @id @default(cuid())
+  slug          String      @unique
+  name          String // "Chakli"
+  nameMarathi   String // "चकली"
+  description   String
+  ingredients   String
+  packSize      String // "250 g"
+  weightGrams   Int // for shipping calc and grams -> packs
+  priceCents    Int // USD cents
+  stock         Int // packs available
+  imageUrl      String
+  spiceLevel    String? // "mild" | "medium" | "spicy"
+  isVeg         Boolean     @default(true)
+  shelfLifeDays Int
+  active        Boolean     @default(true)
+  sortOrder     Int         @default(0)
+  orderItems    OrderItem[]
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  country   String // ISO-2: US, GB, CA, AE, AU
+  orders    Order[]
+  createdAt DateTime @default(now())
+}
+
+model Order {
+  id              String           @id @default(cuid())
+  number          Int              @unique @default(autoincrement()) // display as number + 1000
+  customerId      String
+  customer        Customer         @relation(fields: [customerId], references: [id])
+  items           OrderItem[]
+  subtotalCents   Int
+  shippingCents   Int
+  totalCents      Int
+  currency        String           @default("USD")
+  shipName        String
+  shipLine1       String
+  shipLine2       String?
+  shipCity        String
+  shipState       String?
+  shipPostal      String
+  shipCountry     String
+  giftMessage     String?
+  paymentStatus   PaymentStatus    @default(AWAITING_PAYMENT)
+  fulfilment      FulfilmentStatus @default(NEW)
+  paypalOrderId   String?          @unique
+  paypalCaptureId String?
+  paypalInvoiceId String?
+  trackingNumber  String?
+  carrier         String?
+  source          String           @default("chat") // chat | cart | invoice
+  events          OrderEvent[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  unitCents Int // price snapshot at order time
+}
+
+model OrderEvent {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  type      String // created | paid | status_changed | invoice_sent | tracking_added | refunded | stock_issue | cancelled
+  message   String
+  createdAt DateTime @default(now())
+}
+
+// Server-side cart, keyed by the httpOnly `sessionId` cookie. Shared by chat and "Add to cart".
+model Cart {
+  sessionId String   @id
+  items     Json     @default("[]") // [{ productId, quantity }]
+  country   String? // last quoted shipping country
+  updatedAt DateTime @updatedAt
+}
+
+// Owner write actions waiting for confirmation (PRD 8.3).
+model PendingAction {
+  id        String              @id @default(cuid())
+  type      String // update_fulfilment | create_invoice | refund
+  payload   Json // server-validated arguments
+  summary   String // human-readable "what will happen"
+  status    PendingActionStatus @default(PENDING)
+  result    Json?
+  createdAt DateTime            @default(now())
+}
+
+enum PaymentStatus {
+  AWAITING_PAYMENT
+  PAID
+  REFUNDED
+  CANCELLED
+}
+
+enum FulfilmentStatus {
+  NEW
+  PACKING
+  SHIPPED
+  DELIVERED
+}
+
+enum PendingActionStatus {
+  PENDING
+  EXECUTED
+  CANCELLED
+  FAILED
+}

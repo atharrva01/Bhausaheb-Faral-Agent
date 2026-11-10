@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+/* Warm Diwali palette (PRD 10.4). Light theme only: the festive look is the brand. */
+:root {
+  color-scheme: light;
+  --cream: #fdf6e9;
+  --cream-deep: #f7e8cc;
+  --maroon: #7a1f2b;
+  --maroon-dark: #5a1520;
+  --saffron: #e8772e;
+  --turmeric: #f2b632;
+  --ink: #2b1a12;
+  --muted: #7a6455;
+  --line: #ead8b8;
+  --leaf: #3f7d3a;
+}
+
+@theme inline {
+  --color-cream: var(--cream);
+  --color-cream-deep: var(--cream-deep);
+  --color-maroon: var(--maroon);
+  --color-maroon-dark: var(--maroon-dark);
+  --color-saffron: var(--saffron);
+  --color-turmeric: var(--turmeric);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-leaf: var(--leaf);
+  --font-sans: var(--font-mukta), system-ui, sans-serif;
+  --font-display: var(--font-rozha), Georgia, serif;
+}
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+}
