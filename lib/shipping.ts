@@ -2,14 +2,14 @@
 
 export type CountryCode = "US" | "CA" | "GB" | "AE" | "AU";
 
-type Rate = { name: string; flag: string; baseCents: number; extraPer500gCents: number };
+type Rate = { name: string; short: string; baseCents: number; extraPer500gCents: number };
 
 export const SHIPPING_RATES: Record<CountryCode, Rate> = {
-  US: { name: "United States", flag: "🇺🇸", baseCents: 1800, extraPer500gCents: 600 },
-  CA: { name: "Canada", flag: "🇨🇦", baseCents: 1800, extraPer500gCents: 600 },
-  GB: { name: "United Kingdom", flag: "🇬🇧", baseCents: 1600, extraPer500gCents: 500 },
-  AE: { name: "United Arab Emirates", flag: "🇦🇪", baseCents: 1200, extraPer500gCents: 400 },
-  AU: { name: "Australia", flag: "🇦🇺", baseCents: 2000, extraPer500gCents: 700 },
+  US: { name: "United States", short: "USA", baseCents: 1800, extraPer500gCents: 600 },
+  CA: { name: "Canada", short: "Canada", baseCents: 1800, extraPer500gCents: 600 },
+  GB: { name: "United Kingdom", short: "UK", baseCents: 1600, extraPer500gCents: 500 },
+  AE: { name: "United Arab Emirates", short: "UAE", baseCents: 1200, extraPer500gCents: 400 },
+  AU: { name: "Australia", short: "Australia", baseCents: 2000, extraPer500gCents: 700 },
 };
 
 export const SUPPORTED_COUNTRIES = Object.keys(SHIPPING_RATES) as CountryCode[];

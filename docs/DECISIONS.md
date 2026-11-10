@@ -2,6 +2,17 @@
 
 Short records of choices that deviate from, or refine, the PRD. Newest first.
 
+## 2026-11-10 · M2 PayPal checkout
+
+1. **PayPal JS SDK v5 Smart Buttons** (`PayPalScriptProvider` / `PayPalButtons` from `@paypal/react-paypal-js@10` root export), not the package's new `sdk-v6` components. v5 is the proven path; v6 adds eligibility checks we can't risk during judging. The provider uses `deferLoading`, so the SDK script loads only when a checkout card mounts.
+2. **`Order.sessionId`** (new column): lets capture clear the right cart, and a new checkout from the same session cancels that session's earlier unpaid order (no pile of stale `AWAITING_PAYMENT` rows).
+3. **PayPal `invoice_id = BF-<order cuid>`**, not the order number. PayPal requires invoice ids to be unique per merchant forever, and our order numbers restart on every re-seed.
+4. **Order page access**: `/order/[id]` uses the unguessable cuid as the access token (no customer accounts). Email is masked.
+5. **Capture returns friendly errors**: `INSTRUMENT_DECLINED` restarts the PayPal flow (`actions.restart()`); unapproved/failed captures say "you have not been charged".
+6. **Rate limit** on checkout creation (5/hour/session) is in-memory: an abuse guard only, resets on restart.
+7. **Sandbox accounts must be US, not IN.** A developer account created in India gets India sandbox accounts by default. Paying with them fails in the PayPal popup with "This seller doesn't accept payments in your currency". We created a US business (seller) + US personal (buyer) account and a new REST app linked to the US business account. Real Indian sellers *can* receive international payments, but sandbox IN accounts are restricted; README must tell judges to use the US buyer account.
+8. **Sandbox app scopes** (checked 2026-11-10): invoicing, orders, refunds present. No shipment-tracking scope listed: verify tracking in M5, fall back to DB-only tracking if PayPal rejects it.
+
 ## 2026-11-10 · M1 version check (PRD 5.4)
 
 Installed versions:

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Mukta, Rozha_One } from "next/font/google";
 import "./globals.css";
+import { Providers } from "@/components/Providers";
+import { SiteNav } from "@/components/layout/SiteNav";
 
 // Both fonts cover Latin + Devanagari, so Marathi names render properly.
 const mukta = Mukta({
@@ -23,7 +25,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${mukta.variable} ${rozha.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">
+        <Providers>
+          <SiteNav />
+          {children}
+        </Providers>
+      </body>
     </html>
   );
 }

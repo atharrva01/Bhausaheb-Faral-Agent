@@ -64,6 +64,7 @@ model Order {
   trackingNumber  String?
   carrier         String?
   source          String           @default("chat") // chat | cart | invoice
+  sessionId       String? // visitor session that created it (clears cart on capture)
   events          OrderEvent[]
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt

@@ -19,29 +19,35 @@ export default async function ShopPage() {
   return (
     <main className="flex-1">
       <header className="relative overflow-hidden bg-maroon text-cream">
-        <Diya className="pointer-events-none absolute -right-6 -top-4 h-40 w-40 opacity-20 sm:h-56 sm:w-56" />
-        <div className="mx-auto max-w-6xl px-4 py-12 sm:py-16">
-          <p className="text-sm font-semibold uppercase tracking-widest text-turmeric">Gharguti Diwali faral</p>
-          <h1 className="mt-2 font-display text-4xl leading-tight sm:text-6xl">
-            Bhausaheb Faral <span lang="mr" className="text-turmeric">भाऊसाहेब फराळ</span>
+        <Diya className="pointer-events-none absolute -right-8 -top-2 h-32 w-32 opacity-20 sm:h-56 sm:w-56" />
+        <div className="mx-auto max-w-6xl px-4 py-8 sm:py-14">
+          <p className="text-xs font-semibold uppercase tracking-widest text-turmeric sm:text-sm">Gharguti Diwali faral</p>
+          <h1 className="mt-2 font-display text-3xl leading-tight sm:text-6xl">
+            Bhausaheb Faral{" "}
+            <span lang="mr" className="block text-turmeric sm:inline">
+              भाऊसाहेब फराळ
+            </span>
           </h1>
-          <p className="mt-3 max-w-2xl text-lg text-cream/90 sm:text-xl">
+          <p className="mt-3 max-w-2xl text-base text-cream/90 sm:text-xl">
             Homemade Diwali faral from Karjat, delivered to your doorstep abroad.
           </p>
-          <p className="mt-4 text-sm text-cream/80">
-            Made in Karjat, Maharashtra. Ships to{" "}
-            {SUPPORTED_COUNTRIES.map((c) => `${SHIPPING_RATES[c].flag} ${SHIPPING_RATES[c].name}`).join(", ")}.
-          </p>
-          <p className="mt-1 text-sm text-cream/80">
-            Free shipping on orders over {formatUSD(FREE_SHIPPING_THRESHOLD_CENTS)}. Pay securely in USD with PayPal.
+          <ul className="mt-4 flex flex-wrap gap-2 text-xs sm:text-sm">
+            {SUPPORTED_COUNTRIES.map((c) => (
+              <li key={c} className="rounded-full bg-cream/15 px-2.5 py-1">
+                {SHIPPING_RATES[c].short}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 text-sm text-cream/80">
+            Free shipping over {formatUSD(FREE_SHIPPING_THRESHOLD_CENTS)} · Pay in USD with PayPal
           </p>
         </div>
       </header>
 
-      <section className="mx-auto max-w-6xl px-4 py-10">
-        <h2 className="font-display text-3xl text-maroon">This Diwali&apos;s faral</h2>
+      <section className="mx-auto max-w-6xl px-4 py-8 pb-28 sm:py-10">
+        <h2 className="font-display text-2xl text-maroon sm:text-3xl">This Diwali&apos;s faral</h2>
         <p className="mt-1 text-muted">Made fresh in small batches by Aai. Prices are per pack.</p>
-        <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
           {products.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
