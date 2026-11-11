@@ -82,6 +82,7 @@ export function ChatPanel() {
     <section
       className="fixed inset-0 z-50 flex flex-col bg-cream sm:inset-auto sm:bottom-6 sm:right-6 sm:h-[min(680px,calc(100vh-6rem))] sm:w-[400px] sm:overflow-hidden sm:rounded-2xl sm:border sm:border-line sm:shadow-2xl"
       aria-label="Chat with Aai's assistant"
+      data-chat-status={status}
     >
       <header className="flex items-center justify-between bg-maroon px-4 py-3 text-cream">
         <div>
