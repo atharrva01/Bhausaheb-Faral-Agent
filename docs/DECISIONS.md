@@ -2,6 +2,14 @@
 
 Short records of choices that deviate from, or refine, the PRD. Newest first.
 
+## 2026-11-11 · M4 Owner dashboard
+
+1. **Auth**: jose HS256 JWT in an httpOnly `owner_session` cookie (7 days), constant-time password compare, 10 failed attempts / 10 min per IP. `proxy.ts` guards `/owner/*` (redirect to login) and `/api/owner/*` (401); route handlers re-check with `requireOwner()`.
+2. **Status edit uses a native `<select>` cell renderer**, not AG Grid's `agSelectCellEditor`. In v36 the editor needs two clicks (enter edit mode, then open the list); a native select is one tap and uses the phone's picker. Optimistic update with rollback on error. Only PAID orders get a dropdown; server rejects moving unpaid orders past NEW.
+3. **"Hide cancelled" on by default** in the grid: abandoned checkouts (and test runs) otherwise bury real orders.
+4. **AI summary** (`/api/owner/summary`): server builds compact stats JSON (no emails/addresses) → Gemini writes 5 fixed-emoji lines. Marathi uses `nameMarathi` for products. Cached per language for 5 min **and** keyed on an orders/stock version, so a new order busts the cache immediately. LLM is only called on button click.
+5. KPIs and "today" use Asia/Kolkata day boundaries (`startOfDayIST`). Re-seed right before recording so "today" has orders.
+
 ## 2026-11-10 · M3 Customer agent
 
 1. **Model: `gemini-3.5-flash`, fallback `gemini-3.5-flash-lite`.** `gemini-2.5-flash` and `-flash-lite` return 404 "no longer available to new users" for this key. `gemini-3.8-flash` / `gemini-flash-latest` returned 503 (high demand) when tested.

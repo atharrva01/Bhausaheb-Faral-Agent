@@ -1,10 +1,26 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE } from "@/lib/session";
+import { OWNER_COOKIE, verifyOwnerToken } from "@/lib/owner-session";
 
-// Next 16 "proxy" (formerly middleware).
-// 1. Give every visitor an anonymous httpOnly `sessionId` cookie (server-side cart key).
-// 2. Owner auth for /owner and /api/owner is added in M4.
-export function proxy(request: NextRequest) {
+// Next 16 "proxy" (formerly middleware). Runs on the Node runtime.
+// 1. Owner auth for /owner/* (except /owner/login) and /api/owner/*.
+// 2. Give every visitor an anonymous httpOnly `sessionId` cookie (server-side cart key).
+export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  const ownerArea = pathname === "/owner" || pathname.startsWith("/owner/") || pathname.startsWith("/api/owner");
+  if (ownerArea && pathname !== "/owner/login") {
+    const ok = await verifyOwnerToken(request.cookies.get(OWNER_COOKIE)?.value);
+    if (!ok) {
+      if (pathname.startsWith("/api/")) {
+        return NextResponse.json({ error: "UNAUTHORIZED", message: "Owner login required" }, { status: 401 });
+      }
+      const login = new URL("/owner/login", request.url);
+      login.searchParams.set("next", pathname);
+      return NextResponse.redirect(login);
+    }
+  }
+
   if (request.cookies.has(SESSION_COOKIE)) return NextResponse.next();
 
   const sessionId = crypto.randomUUID();

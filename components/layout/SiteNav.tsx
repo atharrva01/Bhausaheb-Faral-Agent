@@ -20,6 +20,7 @@ export function SiteNav() {
   const pathname = usePathname();
   const count = cart?.itemCount ?? 0;
   const onCheckout = pathname === "/checkout";
+  if (pathname.startsWith("/owner")) return null; // owner pages have their own nav
 
   return (
     <>
