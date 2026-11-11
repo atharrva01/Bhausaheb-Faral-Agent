@@ -8,8 +8,8 @@ export default async function OwnerLayout({ children }: { children: React.ReactN
   return (
     <div className="flex min-h-full flex-1 flex-col bg-[#faf5ec]">
       <header className="sticky top-0 z-40 bg-ink text-cream">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2.5">
-          <div className="flex items-center gap-4">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-2.5 sm:px-4">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-4">
             <Link href="/owner" className="flex items-center font-display text-lg leading-none">
               <span className="hidden sm:inline">Bhausaheb Faral</span>
               <span className="sm:hidden">Faral</span> <span className="ml-1 rounded bg-saffron px-1.5 py-0.5 font-sans text-[11px] font-bold uppercase tracking-wide text-white">Owner</span>
@@ -22,7 +22,7 @@ export default async function OwnerLayout({ children }: { children: React.ReactN
             </Link>
             {loggedIn && (
               <form action={logout}>
-                <button className="rounded-full border border-cream/30 px-3 py-1 hover:bg-cream/10">Log out</button>
+                <button className="whitespace-nowrap rounded-full border border-cream/30 px-3 py-1 hover:bg-cream/10">Log out</button>
               </form>
             )}
           </div>

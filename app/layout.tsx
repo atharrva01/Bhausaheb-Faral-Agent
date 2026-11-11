@@ -18,10 +18,17 @@ const rozha = Rozha_One({
   weight: "400",
 });
 
+const description = "Homemade Diwali faral from Karjat, delivered to your doorstep abroad. Order by chatting, pay in USD with PayPal.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
   title: "Bhausaheb Faral",
-  description: "Homemade Diwali faral from Karjat, delivered to your doorstep abroad.",
+  description,
+  openGraph: { title: "Bhausaheb Faral · Homemade Diwali faral", description, type: "website", siteName: "Bhausaheb Faral" },
+  twitter: { card: "summary", title: "Bhausaheb Faral", description },
 };
+
+export const viewport = { themeColor: "#5a1520" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

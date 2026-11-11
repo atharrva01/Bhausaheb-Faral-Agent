@@ -1,6 +1,6 @@
 "use client";
 
-import { OPEN_CHAT_EVENT } from "@/components/chat/ChatPanel";
+import { OPEN_CHAT_EVENT } from "@/components/chat/events";
 
 export function OpenChatButton({ className, children }: { className?: string; children: React.ReactNode }) {
   return (

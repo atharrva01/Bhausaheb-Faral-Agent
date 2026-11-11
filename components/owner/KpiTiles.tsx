@@ -11,10 +11,10 @@ export function KpiTiles({ kpis }: { kpis: Kpis }) {
   ];
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-      {tiles.map((t) => (
+      {tiles.map((t, i) => (
         <div
           key={t.label}
-          className={`rounded-2xl border p-4 ${t.accent ? "border-saffron bg-saffron/10" : "border-line bg-white"}`}
+          className={`${i === 0 ? "col-span-2 sm:col-span-1 " : ""}rounded-2xl border p-4 ${t.accent ? "border-saffron bg-saffron/10" : "border-line bg-white"}`}
         >
           <p className="text-xs font-semibold uppercase tracking-wide text-muted">{t.label}</p>
           <p className={`mt-1 text-3xl font-bold tabular-nums ${t.warn ? "text-saffron" : "text-ink"}`}>{t.value}</p>

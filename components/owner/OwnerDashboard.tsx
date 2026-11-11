@@ -201,7 +201,55 @@ export function OwnerDashboard({ initialRows, initialKpis }: { initialRows: Orde
             aria-label="Search orders"
           />
         </div>
-        <div className="h-[560px] w-full">
+        {/* Phones: readable cards. Tablets/desktop: the AG Grid. */}
+        <ul className="space-y-2 md:hidden">
+          {visibleRows.length === 0 && <li className="rounded-xl bg-white p-4 text-sm text-muted">No orders.</li>}
+          {visibleRows
+            .filter((r) => {
+              const q = search.trim().toLowerCase();
+              return !q || `${r.number} ${r.customer} ${r.email} ${r.items} ${r.country}`.toLowerCase().includes(q);
+            })
+            .map((r) => {
+              const pay = PAYMENT_STYLE[r.paymentStatus];
+              return (
+                <li key={r.id} className="rounded-xl border border-line bg-white p-3">
+                  <button className="block w-full text-left" onClick={() => setSelected(r)}>
+                    <div className="flex items-baseline justify-between gap-2">
+                      <span className="font-semibold">
+                        {r.number} · {r.customer}
+                      </span>
+                      <span className="font-bold tabular-nums text-maroon">{formatUSD(r.totalCents)}</span>
+                    </div>
+                    <p className="mt-0.5 truncate text-sm text-muted">{r.items}</p>
+                    <p className="mt-0.5 text-xs text-muted">
+                      {istDate.format(new Date(r.createdAt))} · {r.country} · via {r.source}
+                    </p>
+                  </button>
+                  <div className="mt-2 flex items-center gap-2">
+                    <Pill text={pay?.label ?? r.paymentStatus} cls={pay?.cls ?? ""} />
+                    {r.paymentStatus === "PAID" ? (
+                      <select
+                        value={r.fulfilment}
+                        aria-label={`Fulfilment for ${r.number}`}
+                        onChange={(e) => changeStatus(r, e.target.value as (typeof FULFILMENT)[number])}
+                        className={`rounded-full border-0 px-2 py-1 text-xs font-semibold ${FULFIL_STYLE[r.fulfilment] ?? ""}`}
+                      >
+                        {FULFILMENT.map((f) => (
+                          <option key={f} value={f}>
+                            {FULFILMENT_LABEL[f]}
+                          </option>
+                        ))}
+                      </select>
+                    ) : r.paymentStatus !== "CANCELLED" ? (
+                      <Pill text={FULFILMENT_LABEL[r.fulfilment]} cls={FULFIL_STYLE[r.fulfilment] ?? ""} />
+                    ) : null}
+                  </div>
+                </li>
+              );
+            })}
+        </ul>
+
+        <div className="hidden h-[560px] w-full md:block">
           <AgGridReact<OrderRow>
             theme={gridTheme}
             rowData={visibleRows}
@@ -216,7 +264,7 @@ export function OwnerDashboard({ initialRows, initialKpis }: { initialRows: Orde
             animateRows
           />
         </div>
-        <p className="text-xs text-muted">Tip: click a row for details. Change a paid order&apos;s status with its Fulfilment dropdown.</p>
+        <p className="hidden text-xs text-muted md:block">Tip: click a row for details. Change a paid order&apos;s status with its Fulfilment dropdown.</p>
       </section>
 
       {selected && <OrderDrawer order={selected} onClose={() => setSelected(null)} />}

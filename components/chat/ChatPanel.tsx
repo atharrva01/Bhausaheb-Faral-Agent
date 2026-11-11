@@ -9,7 +9,9 @@ import { useCart } from "@/components/shop/CartProvider";
 import { PayPalCheckout } from "@/components/checkout/PayPalCheckout";
 import { CartCard, RichText } from "@/components/chat/ChatCards";
 
-export const OPEN_CHAT_EVENT = "bf:open-chat";
+import { OPEN_CHAT_EVENT } from "@/components/chat/events";
+import { isShopPage } from "@/lib/ui-routes";
+export { OPEN_CHAT_EVENT };
 
 const SUGGESTIONS = [
   "2 chakli and 1 kilo besan ladoo to New Jersey",
@@ -32,7 +34,7 @@ export function ChatPanel() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const pathname = usePathname();
-  const { cart, refresh } = useCart();
+  const { refresh } = useCart();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const { messages, sendMessage, status, error, regenerate, clearError } = useChat<CustomerUIMessage>({
@@ -62,15 +64,13 @@ export function ChatPanel() {
     setInput("");
   }
 
-  const cartBarVisible = (cart?.itemCount ?? 0) > 0 && pathname !== "/checkout";
-
   if (!open) {
+    // Desktop floating launcher on shopping pages only; on mobile the bottom bar opens the chat.
+    if (!isShopPage(pathname)) return null;
     return (
       <button
         onClick={() => setOpen(true)}
-        className={`fixed right-4 z-40 flex items-center gap-2 rounded-full bg-saffron px-4 py-3 font-semibold text-white shadow-lg transition hover:brightness-105 sm:bottom-6 ${
-          cartBarVisible ? "bottom-24" : "bottom-5"
-        }`}
+        className="fixed bottom-6 right-6 z-40 hidden items-center gap-2 rounded-full bg-saffron px-5 py-3 font-semibold text-white shadow-lg transition hover:brightness-105 sm:flex"
       >
         <ChatIcon />
         <span>Order with Aai&apos;s assistant</span>
