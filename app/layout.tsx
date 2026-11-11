@@ -1,44 +1,42 @@
 import type { Metadata } from "next";
-import { Mukta, Rozha_One } from "next/font/google";
+import { Anek_Devanagari, Tiro_Devanagari_Marathi } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
-import { SiteNav } from "@/components/layout/SiteNav";
-import { ChatPanel } from "@/components/chat/ChatPanel";
 
-// Both fonts cover Latin + Devanagari, so Marathi names render properly.
-const mukta = Mukta({
-  variable: "--font-mukta",
+// Anek Devanagari: one family, two jobs via the width axis (signboard condensed, bill print normal).
+const anek = Anek_Devanagari({
+  variable: "--font-anek",
   subsets: ["latin", "devanagari"],
-  weight: ["400", "500", "600", "700"],
+  axes: ["wdth"],
+  display: "swap",
 });
 
-const rozha = Rozha_One({
-  variable: "--font-rozha",
+// Tiro Devanagari Marathi: Marathi letterforms (ल, श) for Marathi words only.
+const tiroMr = Tiro_Devanagari_Marathi({
+  variable: "--font-tiro-mr",
   subsets: ["latin", "devanagari"],
   weight: "400",
+  style: ["normal", "italic"],
+  display: "swap",
 });
 
-const description = "Homemade Diwali faral from Karjat, delivered to your doorstep abroad. Order by chatting, pay in USD with PayPal.";
+const description = "Aai's Diwali faral from Bhausaheb Kirana, Karjat. Fried, rolled and packed by hand, posted to the US, UK, Canada, UAE and Australia.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
   title: "Bhausaheb Faral",
   description,
-  openGraph: { title: "Bhausaheb Faral · Homemade Diwali faral", description, type: "website", siteName: "Bhausaheb Faral" },
+  openGraph: { title: "Bhausaheb Faral, Karjat", description, type: "website", siteName: "Bhausaheb Faral" },
   twitter: { card: "summary", title: "Bhausaheb Faral", description },
 };
 
-export const viewport = { themeColor: "#5a1520" };
+export const viewport = { themeColor: "#9a1c23" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${mukta.variable} ${rozha.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col font-sans">
-        <Providers>
-          <SiteNav />
-          {children}
-          <ChatPanel />
-        </Providers>
+    <html lang="en" className={`${anek.variable} ${tiroMr.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col">
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

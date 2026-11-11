@@ -17,11 +17,13 @@ export function cartView(cart: PricedCart) {
     lines: cart.lines.map((l) => ({
       product: l.slug,
       name: l.name,
+      nameMarathi: l.nameMarathi,
       packSize: l.packSize,
       quantity: l.quantity,
       unitPrice: formatUSD(l.unitCents),
       lineTotal: formatUSD(l.lineCents),
       lineCents: l.lineCents,
+      unitCents: l.unitCents,
     })),
     itemCount: cart.itemCount,
     subtotal: formatUSD(cart.subtotalCents),

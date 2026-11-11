@@ -1,85 +1,61 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { OpenChatButton } from "@/components/chat/OpenChatButton";
+import { Signboard } from "@/components/brand/Signboard";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { BillBar } from "@/components/shop/BillBar";
 
 export const metadata: Metadata = {
   title: "Our story · Bhausaheb Faral",
-  description: "A family kirana shop in Karjat, Aai's homemade Diwali faral, and how AI + PayPal let relatives abroad order it.",
+  description: "A kirana shop in Karjat, Aai's Diwali faral, and how relatives abroad now order it without five phone calls.",
 };
 
 export default function AboutPage() {
   return (
     <>
-      <main className="flex-1">
-        <header className="bg-maroon text-cream">
-          <div className="mx-auto max-w-3xl px-4 py-12 sm:py-16">
-            <p className="text-xs font-semibold uppercase tracking-widest text-turmeric sm:text-sm">Our story</p>
-            <h1 className="mt-2 font-display text-3xl leading-tight sm:text-5xl">From Aai&apos;s kitchen in Karjat to your Diwali table abroad</h1>
-          </div>
-        </header>
+      <Signboard slim />
+      <main className="mx-auto w-full max-w-[680px] flex-1 px-4 pb-14 pt-9 sm:px-6">
+        <h1 className="type-title text-[30px] leading-[1.1] sm:text-[40px]">Our story</h1>
 
-        <article className="mx-auto max-w-3xl space-y-10 px-4 py-10 text-[17px] leading-relaxed">
-          <section className="space-y-3">
-            <p>
-              <strong>Bhausaheb General Kirana Stores</strong> sits opposite the bus depot in Karjat, a small town in Raigad, Maharashtra.
-              Every Diwali, Aai makes faral by hand in small batches: chakli from her own roasted bhajani, besan ladoo slow-roasted in ghee,
-              karanji, shankarpali, chivda and anarse.
-            </p>
-            <p>
-              Relatives and Marathi families in the US, UK, Canada, UAE and Australia want that taste of home. Until now every order
-              meant WhatsApp calls, prices worked out by hand, and asking someone in India to pay on their behalf. Nobody could see what was
-              paid, packed or shipped.
-            </p>
-          </section>
+        <div className="mt-6 space-y-5 text-lg leading-[1.7]">
+          <p>
+            Bhausaheb General Kirana Stores sits opposite the bus depot in Karjat, in Raigad district. Most of the year it sells what every kirana
+            sells. Every Diwali, Aai turns the back of the house into a faral kitchen: chakli pressed from her own roasted bhajani, besan ladoo
+            roasted slowly in ghee, karanji, shankarpali, chivda, and anarse when there&apos;s time.
+          </p>
+          <p>
+            Our relatives in New Jersey, Leicester, Brampton, Dubai and Parramatta wanted that faral too. Every order meant a WhatsApp call, a price
+            worked out on the spot, a cousin in Pune asked to pay on someone&apos;s behalf, and nobody quite sure what was paid, packed or posted.
+          </p>
 
-          <section>
-            <h2 className="font-display text-2xl text-maroon">What this app does</h2>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-2xl border border-line bg-white p-5">
-                <h3 className="font-semibold">For customers abroad</h3>
-                <p className="mt-1 text-[15px] text-muted">
-                  Chat in English, Hinglish or Marathi (&quot;1 kilo ladoo aur do packet chivda Dubai bhejna hai&quot;). The assistant builds the cart,
-                  quotes international shipping and shows a PayPal button. You pay in USD.
-                </p>
-              </div>
-              <div className="rounded-2xl border border-line bg-white p-5">
-                <h3 className="font-semibold">For Aai and the shop</h3>
-                <p className="mt-1 text-[15px] text-muted">
-                  One dashboard with every order, a daily summary in Marathi, and an assistant that can mark orders shipped with tracking and
-                  send PayPal invoices, always after a Confirm click.
-                </p>
-              </div>
-            </div>
-          </section>
+          <h2 className="type-head border-b-2 border-ink pb-2 pt-4 text-2xl">What changed</h2>
+          <p>
+            Now you write to the counter the way you&apos;d talk to us, in English, Hinglish or Marathi. The counter writes your bill, adds postage
+            for your country, and opens PayPal so you can pay in US dollars. Aai sees a list of what to fry and pack today; Atharva marks parcels as
+            posted and the tracking number goes straight onto your PayPal payment.
+          </p>
 
-          <section className="space-y-3">
-            <h2 className="font-display text-2xl text-maroon">Why you can trust the total</h2>
-            <p>
-              The AI only decides <em>what</em> you want: which faral, how many, where to ship. Every price, shipping cost and PayPal amount is
-              calculated by our server from the shop&apos;s database. No chat message can change what you pay.
-            </p>
-          </section>
+          <h2 className="type-head border-b-2 border-ink pb-2 pt-4 text-2xl">Why the total can&apos;t be talked down</h2>
+          <p>
+            The assistant only decides what you want: which faral, how many packets, where it&apos;s going. Every rate, the postage and the amount
+            PayPal charges are worked out by the shop&apos;s own system from the rate board. Asking the chat for a $1 total gets you a polite no.
+          </p>
 
-          <section className="space-y-3 rounded-2xl bg-cream-deep/60 p-5 text-[15px]">
-            <h2 className="font-semibold">A note on shipping food abroad</h2>
-            <p className="text-muted">
-              International food parcels have import rules (for example US FDA prior notice, and Australian biosecurity limits on dairy and ghee).
-              This is a hackathon demo running on PayPal sandbox; a real launch would handle those rules per country.
-            </p>
-          </section>
+          <h2 className="type-head border-b-2 border-ink pb-2 pt-4 text-2xl">About sending food abroad</h2>
+          <p className="text-pencil">
+            Countries have rules about food parcels: the US asks for prior notice, and Australia is strict about dairy and ghee. This is a hackathon
+            demo running on PayPal&apos;s sandbox. A real season would handle those rules country by country.
+          </p>
+        </div>
 
-          <div className="flex flex-wrap gap-3">
-            <OpenChatButton className="rounded-full bg-saffron px-6 py-3 font-semibold text-white hover:brightness-105">
-              Order by chatting with Aai&apos;s assistant
-            </OpenChatButton>
-            <Link href="/" className="rounded-full border border-line px-6 py-3 font-semibold hover:bg-cream-deep">
-              Browse the faral
-            </Link>
-          </div>
-        </article>
+        <p className="mt-9 text-lg">
+          <Link href="/#counter" className="font-semibold text-stamp underline underline-offset-4">
+            Go to the counter and order
+          </Link>
+        </p>
+        <p className="mt-6 text-pencil">Atharva, for Aai and the shop</p>
       </main>
       <SiteFooter />
+      <BillBar />
     </>
   );
 }

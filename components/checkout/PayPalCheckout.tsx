@@ -14,8 +14,8 @@ type Props = {
 };
 
 /**
- * PayPal Smart Buttons for an order the SERVER already created. The client never sends an amount.
- * Reused by the cart drawer (M2) and the chat agent's checkout card (M3).
+ * PayPal buttons for a bill the SERVER already wrote. The browser never sends an amount.
+ * Sits inside a bill slip (checkout, counter, unpaid order page).
  */
 export function PayPalCheckout({ orderId, orderNumber, paypalOrderId, totalCents, onPaid }: Props) {
   const router = useRouter();
@@ -23,36 +23,26 @@ export function PayPalCheckout({ orderId, orderNumber, paypalOrderId, totalCents
   const [status, setStatus] = useState<"idle" | "capturing" | "paid">("idle");
   const [error, setError] = useState<string | null>(null);
 
-  // Load the SDK script on first checkout (provider uses deferLoading).
   useEffect(() => {
     dispatch({ type: DISPATCH_ACTION.LOADING_STATUS, value: SCRIPT_LOADING_STATE.PENDING });
   }, [dispatch]);
 
   if (status === "paid") {
-    return (
-      <div className="rounded-xl border border-leaf/40 bg-leaf/10 p-4 text-sm">
-        <p className="font-semibold text-leaf">Payment received for order {orderNumber}. Dhanyavaad! 🪔</p>
-        <p className="mt-1 text-muted">Opening your order page…</p>
-      </div>
-    );
+    return <p className="font-semibold text-stamp" role="status">Paid. Opening bill {orderNumber}…</p>;
   }
 
   return (
-    <div className="rounded-xl border border-line bg-white p-4">
-      <div className="mb-3 flex items-baseline justify-between text-sm">
-        <span className="text-muted">Order {orderNumber}</span>
-        <span className="text-base font-bold text-maroon">Pay {formatUSD(totalCents)}</span>
-      </div>
-
-      {isPending && <p className="py-4 text-center text-sm text-muted">Loading PayPal…</p>}
-      {isRejected && <p className="py-4 text-center text-sm text-red-700">PayPal could not load. Please refresh the page.</p>}
-
+    <div className="space-y-2">
+      <p className="text-[15px] text-pencil">
+        Pay <strong className="num text-ink">{formatUSD(totalCents)}</strong> for bill {orderNumber} with PayPal.
+      </p>
+      {isPending && <p className="py-3 text-[15px] text-pencil">Opening PayPal…</p>}
+      {isRejected && <p className="py-3 text-khata">PayPal didn&apos;t load. Refresh the page; your bill is saved.</p>}
       {status === "capturing" ? (
-        <p className="py-4 text-center text-sm text-muted">Confirming your payment…</p>
+        <p className="py-3 text-[15px] text-pencil" role="status">PayPal is confirming the payment…</p>
       ) : (
         <PayPalButtons
-          style={{ layout: "vertical", color: "gold", shape: "rect", label: "pay" }}
-          fundingSource={undefined}
+          style={{ layout: "vertical", color: "gold", shape: "rect", label: "pay", height: 48 }}
           forceReRender={[paypalOrderId]}
           createOrder={async () => paypalOrderId}
           onApprove={async (_data, actions) => {
@@ -72,21 +62,20 @@ export function PayPalCheckout({ orderId, orderNumber, paypalOrderId, totalCents
             }
             setStatus("idle");
             if (json.error === "DECLINED") {
-              setError(json.message);
+              setError("PayPal declined that card or account. Pick another way to pay; nothing was charged.");
               return actions.restart();
             }
-            setError(json.message ?? "Payment failed. You have not been charged.");
+            setError("PayPal didn't complete the payment, so nothing was charged. Try the PayPal button again.");
           }}
-          onCancel={() => setError("Payment cancelled. Your cart is saved; you can pay any time.")}
+          onCancel={() => setError("You closed PayPal before paying. The bill is saved; pay whenever you're ready.")}
           onError={(err) => {
             console.error("PayPal button error", err);
-            setError("PayPal ran into a problem. Please try again.");
+            setError("PayPal ran into a problem. Try again; nothing was charged.");
           }}
         />
       )}
-
-      {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
-      <p className="mt-2 text-center text-xs text-muted">Sandbox demo: use a PayPal sandbox buyer account.</p>
+      {error && <p role="alert" className="text-[15px] text-khata">{error}</p>}
+      <p className="text-sm text-pencil">Sandbox demo: use a PayPal sandbox buyer account.</p>
     </div>
   );
 }

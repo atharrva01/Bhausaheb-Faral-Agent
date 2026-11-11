@@ -49,7 +49,7 @@ export function friendlyAiError(err: unknown): string {
   const status = APICallError.isInstance(err) ? err.statusCode : undefined;
   console.error("[ai] chat error", status ?? "", err instanceof Error ? err.message : err);
   if (status === 429 || status === 503) {
-    return "Aai's assistant is busy with lots of Diwali orders right now. Please try again in a few seconds.";
+    return "The counter is busy, lots of Diwali orders at once. Wait about 10 seconds and send again, or add packets from today's rates.";
   }
-  return "Sorry, the assistant ran into a problem. Please try again, or use the Add to cart buttons.";
+  return "The counter didn't hear that. Send it again; your bill is safe.";
 }

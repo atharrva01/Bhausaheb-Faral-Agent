@@ -1,22 +1,27 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { formatUSD } from "@/lib/money";
 import { displayOrderNumber } from "@/lib/format";
 import { SHIPPING_RATES, isSupportedCountry } from "@/lib/shipping";
+import { Signboard } from "@/components/brand/Signboard";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+import { Bill } from "@/components/bill/Bill";
+import { ShopStamp } from "@/components/bill/ShopStamp";
 import { PayPalCheckout } from "@/components/checkout/PayPalCheckout";
 
 export const dynamic = "force-dynamic";
+export const metadata: Metadata = { title: "Your bill · Bhausaheb Faral" };
 
-const PAYMENT_LABEL = {
-  AWAITING_PAYMENT: { text: "Awaiting payment", cls: "bg-turmeric/30 text-ink" },
-  PAID: { text: "Paid", cls: "bg-leaf text-white" },
-  REFUNDED: { text: "Refunded", cls: "bg-ink/70 text-white" },
-  CANCELLED: { text: "Cancelled", cls: "bg-ink/20 text-ink" },
-} as const;
+const day = new Intl.DateTimeFormat("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short", year: "numeric" });
+const dayShort = new Intl.DateTimeFormat("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short" });
 
-const STEPS = ["NEW", "PACKING", "SHIPPED", "DELIVERED"] as const;
-const STEP_LABEL = { NEW: "Order received", PACKING: "Aai is packing", SHIPPED: "Shipped", DELIVERED: "Delivered" };
+const STEPS = [
+  { key: "NEW", label: "Order written" },
+  { key: "PACKING", label: "Aai is packing" },
+  { key: "SHIPPED", label: "Posted" },
+  { key: "DELIVERED", label: "Reached you" },
+] as const;
 
 function maskEmail(email: string) {
   const [user, domain] = email.split("@");
@@ -28,90 +33,120 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
   const { id } = await params;
   const order = await db.order.findUnique({
     where: { id },
-    include: { customer: true, items: { include: { product: true } } },
+    include: {
+      customer: true,
+      items: { include: { product: true } },
+      events: { where: { type: "paid" }, orderBy: { createdAt: "asc" }, take: 1 },
+    },
   });
   if (!order) notFound();
 
   const label = displayOrderNumber(order.number);
-  const payment = PAYMENT_LABEL[order.paymentStatus];
-  const country = isSupportedCountry(order.shipCountry) ? SHIPPING_RATES[order.shipCountry] : null;
-  const stepIndex = STEPS.indexOf(order.fulfilment);
+  const where = isSupportedCountry(order.shipCountry) ? SHIPPING_RATES[order.shipCountry].name : order.shipCountry;
   const paid = order.paymentStatus === "PAID";
+  const paidOn = order.events[0]?.createdAt ?? order.updatedAt;
+  const reached = STEPS.findIndex((s) => s.key === order.fulfilment);
+  const first = order.customer.name.split(" ")[0];
+
+  const stamp =
+    order.paymentStatus === "PAID" ? (
+      <ShopStamp label={`Stamped paid on ${dayShort.format(paidOn)}`} sub={`Paid, ${dayShort.format(paidOn)}`} />
+    ) : order.paymentStatus === "REFUNDED" ? (
+      <ShopStamp label="Stamped refunded" center="परत केले" sub="Refunded" />
+    ) : null;
 
   return (
-    <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-10">
-      <p className="text-sm text-muted">Bhausaheb Faral</p>
-      <div className="flex flex-wrap items-center gap-3">
-        <h1 className="font-display text-4xl text-maroon">Order {label}</h1>
-        <span className={`rounded-full px-3 py-1 text-sm font-semibold ${payment.cls}`}>{payment.text}</span>
-      </div>
-      {paid && (
+    <>
+      <Signboard slim />
+      <main className="mx-auto w-full max-w-[680px] flex-1 px-4 pb-16 pt-7 sm:px-6 sm:pt-9">
+        <h1 className="type-title text-[30px] leading-[1.1] sm:text-[40px]">Bill {label}</h1>
         <p className="mt-2 text-lg">
-          Dhanyavaad, {order.customer.name.split(" ")[0]}! 🪔 Aai will start making your faral fresh.
+          {paid
+            ? `Thank you, ${first}. The money is in, so Aai can fry and pack your faral.`
+            : order.paymentStatus === "AWAITING_PAYMENT"
+              ? "This bill isn't paid yet."
+              : order.paymentStatus === "REFUNDED"
+                ? "This bill was refunded."
+                : "This bill was cancelled. Nothing was charged."}
         </p>
-      )}
 
-      {paid && (
-        <ol className="mt-6 grid grid-cols-4 gap-2 text-center text-xs">
-          {STEPS.map((s, i) => (
-            <li key={s} className={`rounded-lg px-1 py-2 ${i <= stepIndex ? "bg-saffron text-white" : "bg-cream-deep text-muted"}`}>
-              {STEP_LABEL[s]}
-            </li>
-          ))}
-        </ol>
-      )}
-      {order.trackingNumber && (
-        <p className="mt-3 text-sm">
-          Tracking: <strong>{order.carrier}</strong> {order.trackingNumber}
-        </p>
-      )}
-
-      {order.paymentStatus === "AWAITING_PAYMENT" && order.paypalOrderId && (
         <div className="mt-6">
-          <PayPalCheckout orderId={order.id} orderNumber={label} paypalOrderId={order.paypalOrderId} totalCents={order.totalCents} />
+          <Bill
+            label={`Bill ${label}`}
+            number={String(order.number + 1000)}
+            date={day.format(order.createdAt)}
+            lines={order.items.map((it) => ({
+              key: it.id,
+              qty: it.quantity,
+              name: it.product.name,
+              nameMr: it.product.nameMarathi,
+              pack: it.product.packSize,
+              rateCents: it.unitCents,
+              amountCents: it.unitCents * it.quantity,
+            }))}
+            postage={{ label: `Postage to ${where}`, cents: order.shippingCents, free: order.shippingCents === 0 }}
+            totalCents={order.totalCents}
+            stamp={stamp}
+          >
+            {order.paymentStatus === "AWAITING_PAYMENT" && order.paypalOrderId && (
+              <PayPalCheckout orderId={order.id} orderNumber={label} paypalOrderId={order.paypalOrderId} totalCents={order.totalCents} />
+            )}
+          </Bill>
         </div>
-      )}
 
-      <section className="mt-8 rounded-2xl border border-line bg-white/70 p-5">
-        <h2 className="mb-3 font-semibold">Items</h2>
-        <ul className="divide-y divide-line text-sm">
-          {order.items.map((it) => (
-            <li key={it.id} className="flex justify-between py-2">
-              <span>
-                {it.product.name} <span className="text-muted">({it.product.packSize}) × {it.quantity}</span>
-              </span>
-              <span className="tabular-nums">{formatUSD(it.unitCents * it.quantity)}</span>
-            </li>
-          ))}
-        </ul>
-        <dl className="mt-3 space-y-1 border-t border-line pt-3 text-sm">
-          <div className="flex justify-between"><dt>Subtotal</dt><dd className="tabular-nums">{formatUSD(order.subtotalCents)}</dd></div>
-          <div className="flex justify-between"><dt>Shipping</dt><dd className="tabular-nums">{order.shippingCents === 0 ? "FREE" : formatUSD(order.shippingCents)}</dd></div>
-          <div className="flex justify-between text-base font-bold text-maroon"><dt>Total</dt><dd className="tabular-nums">{formatUSD(order.totalCents)} USD</dd></div>
-        </dl>
-      </section>
-
-      <section className="mt-4 grid gap-4 text-sm sm:grid-cols-2">
-        <div className="rounded-2xl border border-line bg-white/70 p-5">
-          <h2 className="mb-2 font-semibold">Shipping to</h2>
-          <p>{order.shipName}</p>
-          <p className="text-muted">
-            {order.shipCity}
-            {order.shipState ? `, ${order.shipState}` : ""} · {country ? country.name : order.shipCountry}
-          </p>
-          <p className="mt-1 text-muted">{maskEmail(order.customer.email)}</p>
-        </div>
-        {order.giftMessage && (
-          <div className="rounded-2xl border border-line bg-white/70 p-5">
-            <h2 className="mb-2 font-semibold">Gift message</h2>
-            <p className="italic">“{order.giftMessage}”</p>
-          </div>
+        {paid && (
+          <section aria-labelledby="parcel-steps" className="mt-10">
+            <h2 id="parcel-steps" className="type-head border-b-2 border-ink pb-2 text-2xl">
+              Where your parcel is
+            </h2>
+            <ol className="mt-1">
+              {STEPS.map((s, i) => {
+                const done = i <= reached;
+                return (
+                  <li key={s.key} className="flex items-baseline gap-3 border-b border-rule py-3">
+                    <span aria-hidden="true" className={`inline-block h-3 w-3 shrink-0 translate-y-[1px] border-[1.5px] border-ink ${done ? "bg-ink" : ""}`} />
+                    <span className={done ? "font-semibold" : "text-pencil"}>
+                      {s.label}
+                      <span className="sr-only">{done ? ", done" : ", not yet"}</span>
+                    </span>
+                    <span className="ml-auto text-right text-[15px] text-pencil">
+                      {s.key === "NEW" && day.format(order.createdAt)}
+                      {s.key === "SHIPPED" && order.trackingNumber && `${order.carrier ?? ""} ${order.trackingNumber}`}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
         )}
-      </section>
 
-      <Link href="/" className="mt-8 inline-block text-maroon underline">
-        ← Back to the shop
-      </Link>
-    </main>
+        <section aria-labelledby="parcel-for" className="mt-10 grid gap-6 sm:grid-cols-2">
+          <div>
+            <h2 id="parcel-for" className="type-head text-xl">
+              Parcel for
+            </h2>
+            <p className="mt-1">{order.shipName}</p>
+            <p className="text-pencil">
+              {order.shipCity}
+              {order.shipState ? `, ${order.shipState}` : ""}, {where}
+            </p>
+            <p className="text-pencil">Tracking goes to {maskEmail(order.customer.email)}</p>
+          </div>
+          {order.giftMessage && (
+            <div>
+              <h2 className="type-head text-xl">Note inside</h2>
+              <p className="mr mt-1 italic">&ldquo;{order.giftMessage}&rdquo;</p>
+            </div>
+          )}
+        </section>
+
+        <p className="mt-10">
+          <Link href="/" className="font-semibold text-stamp underline underline-offset-4">
+            Back to today&apos;s rates
+          </Link>
+        </p>
+      </main>
+      <SiteFooter />
+    </>
   );
 }

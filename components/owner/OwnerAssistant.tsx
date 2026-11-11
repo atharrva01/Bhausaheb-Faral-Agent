@@ -5,7 +5,7 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import type { OwnerUIMessage } from "@/app/api/owner/chat/route";
 import type { ActionCard as ActionCardData } from "@/lib/owner/actions";
-import { RichText } from "@/components/chat/ChatCards";
+import { RichText } from "@/components/counter/RichText";
 
 const SUGGESTIONS = [
   "What orders are pending?",
