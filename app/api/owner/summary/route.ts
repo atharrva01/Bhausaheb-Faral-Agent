@@ -34,9 +34,9 @@ export async function GET(req: Request) {
         "Use ONLY the numbers in the JSON. Never invent orders, names or amounts. No greeting, no sign-off, no markdown headings.",
       prompt:
         `Language: ${LANG[lang]}.\n` +
-        "Write exactly 5 short lines, starting with these emojis in this order: " +
-        "📦 orders today, 💰 revenue today (and this week), ⭐ best seller, ⏳ unpaid orders (name them, or say none), " +
-        "🎁 what to pack first (up to 3 order numbers) and any low stock.\n\n" +
+        "Write exactly 5 short plain sentences, one per line, no emoji, no bullets, no numbering, no headings, in this order: " +
+        "orders today; money today and this week; the best seller; unpaid bills (name them, or say none); " +
+        "what to pack first (up to 3 order numbers) and anything running out.\n\n" +
         `DATA:\n${JSON.stringify(stats)}`,
     });
     const generatedAt = new Date().toISOString();

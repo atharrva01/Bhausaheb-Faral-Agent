@@ -8,7 +8,7 @@ export function RichText({ text }: { text: string }) {
         const isList = lines.length > 0 && lines.every((l) => /^\s*([-*•]|\d+\.)\s+/.test(l));
         if (isList) {
           return (
-            <ul key={i} className="list-disc space-y-0.5 pl-5 marker:text-pencil">
+            <ul key={i} className="list-disc space-y-0.5 pl-5 marker:text-muted">
               {lines.map((l, j) => (
                 <li key={j}>{bold(l.replace(/^\s*([-*•]|\d+\.)\s+/, ""))}</li>
               ))}

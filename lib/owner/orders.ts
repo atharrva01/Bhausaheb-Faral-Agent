@@ -10,7 +10,7 @@ export async function listOrderRows(limit = 300) {
     take: limit,
     include: {
       customer: { select: { name: true, email: true } },
-      items: { include: { product: { select: { name: true, packSize: true } } } },
+      items: { include: { product: { select: { name: true, nameMarathi: true, slug: true, packSize: true } } } },
       events: { orderBy: { createdAt: "asc" }, select: { type: true, message: true, createdAt: true } },
     },
   });
@@ -31,7 +31,7 @@ export async function listOrderRows(limit = 300) {
     fulfilment: o.fulfilment,
     source: o.source,
     detail: {
-      lines: o.items.map((i) => ({ name: i.product.name, packSize: i.product.packSize, quantity: i.quantity, unitCents: i.unitCents })),
+      lines: o.items.map((i) => ({ slug: i.product.slug, name: i.product.name, nameMarathi: i.product.nameMarathi, packSize: i.product.packSize, quantity: i.quantity, unitCents: i.unitCents })),
       address: [o.shipName, o.shipLine1, o.shipLine2, [o.shipCity, o.shipState, o.shipPostal].filter(Boolean).join(" "), o.shipCountry]
         .filter(Boolean)
         .join("\n"),
@@ -65,7 +65,7 @@ export async function setFulfilment(
   if (order.fulfilment !== fulfilment) {
     events.push({
       type: "status_changed",
-      message: `${LABEL[order.fulfilment]} → ${LABEL[fulfilment]}${opts.actor ? ` (${opts.actor})` : ""}`,
+      message: `${LABEL[order.fulfilment]} to ${LABEL[fulfilment]}${opts.actor ? ` (${opts.actor})` : ""}`,
     });
   }
   if (opts.trackingNumber) {

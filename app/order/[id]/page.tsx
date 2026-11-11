@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { displayOrderNumber } from "@/lib/format";
 import { SHIPPING_RATES, isSupportedCountry } from "@/lib/shipping";
-import { Signboard } from "@/components/brand/Signboard";
+import { Suspense } from "react";
+import { SiteHeader } from "@/components/brand/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { Bill } from "@/components/bill/Bill";
 import { ShopStamp } from "@/components/bill/ShopStamp";
@@ -57,10 +58,12 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
 
   return (
     <>
-      <Signboard slim />
+      <Suspense>
+        <SiteHeader />
+      </Suspense>
       <main className="mx-auto w-full max-w-[680px] flex-1 px-4 pb-16 pt-7 sm:px-6 sm:pt-9">
         <h1 className="type-title text-[30px] leading-[1.1] sm:text-[40px]">Bill {label}</h1>
-        <p className="mt-2 text-lg">
+        <p className="mt-2 text-lg text-muted">
           {paid
             ? `Thank you, ${first}. The money is in, so Aai can fry and pack your faral.`
             : order.paymentStatus === "AWAITING_PAYMENT"
@@ -96,20 +99,20 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
 
         {paid && (
           <section aria-labelledby="parcel-steps" className="mt-10">
-            <h2 id="parcel-steps" className="type-head border-b-2 border-ink pb-2 text-2xl">
+            <h2 id="parcel-steps" className="type-head border-b border-line pb-2 text-2xl">
               Where your parcel is
             </h2>
             <ol className="mt-1">
               {STEPS.map((s, i) => {
                 const done = i <= reached;
                 return (
-                  <li key={s.key} className="flex items-baseline gap-3 border-b border-rule py-3">
-                    <span aria-hidden="true" className={`inline-block h-3 w-3 shrink-0 translate-y-[1px] border-[1.5px] border-ink ${done ? "bg-ink" : ""}`} />
-                    <span className={done ? "font-semibold" : "text-pencil"}>
+                  <li key={s.key} className="flex items-baseline gap-3 border-b border-line py-3">
+                    <span aria-hidden="true" className={`inline-block h-3 w-3 shrink-0 translate-y-[1px] border-[1.5px] border-accent ${done ? "bg-accent" : ""}`} />
+                    <span className={done ? "font-semibold" : "text-muted"}>
                       {s.label}
                       <span className="sr-only">{done ? ", done" : ", not yet"}</span>
                     </span>
-                    <span className="ml-auto text-right text-[15px] text-pencil">
+                    <span className="ml-auto text-right text-[15px] text-muted">
                       {s.key === "NEW" && day.format(order.createdAt)}
                       {s.key === "SHIPPED" && order.trackingNumber && `${order.carrier ?? ""} ${order.trackingNumber}`}
                     </span>
@@ -126,11 +129,11 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
               Parcel for
             </h2>
             <p className="mt-1">{order.shipName}</p>
-            <p className="text-pencil">
+            <p className="text-muted">
               {order.shipCity}
               {order.shipState ? `, ${order.shipState}` : ""}, {where}
             </p>
-            <p className="text-pencil">Tracking goes to {maskEmail(order.customer.email)}</p>
+            <p className="text-muted">Tracking goes to {maskEmail(order.customer.email)}</p>
           </div>
           {order.giftMessage && (
             <div>
@@ -141,8 +144,8 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
         </section>
 
         <p className="mt-10">
-          <Link href="/" className="font-semibold text-stamp underline underline-offset-4">
-            Back to today&apos;s rates
+          <Link href="/" className="font-semibold text-accent underline underline-offset-4">
+            Continue shopping
           </Link>
         </p>
       </main>

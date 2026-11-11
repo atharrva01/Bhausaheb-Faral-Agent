@@ -74,7 +74,7 @@ export const proposalSchema = z.discriminatedUnion("type", [
 export type Proposal = z.infer<typeof proposalSchema>;
 
 export type ActionCard =
-  | { ok: true; actionId: string; type: Proposal["type"]; title: string; details: string[]; totalCents?: number }
+  | { ok: true; actionId: string; type: Proposal["type"]; title: string; details: string[]; totalCents?: number; confirmLabel: string; doneLabel: string }
   | { ok: false; problems: string[] };
 
 const CARRIER_CODES: Record<string, string> = {
@@ -102,7 +102,8 @@ export async function proposeAction(input: Proposal): Promise<ActionCard> {
     const carrier = input.carrier?.trim();
     const tracking = input.trackingNumber?.replace(/\s+/g, "").toUpperCase();
     const paypalTracking = !!(tracking && order.paypalCaptureId && order.paypalOrderId);
-    const details = [`${label} · ${order.customer.name} · ${order.shipCountry}`, `Status: ${order.fulfilment} → ${input.status}`];
+    const STATUS_WORD = { NEW: "not started", PACKING: "packing", SHIPPED: "posted", DELIVERED: "delivered" } as const;
+    const details = [`${label}, ${order.customer.name}, ${order.shipCountry}`, `From ${STATUS_WORD[order.fulfilment]} to ${STATUS_WORD[input.status]}`];
     if (tracking) details.push(`Tracking: ${carrier ?? "carrier?"} ${tracking}`);
     if (tracking) {
       details.push(
@@ -115,7 +116,8 @@ export async function proposeAction(input: Proposal): Promise<ActionCard> {
     const pa = await db.pendingAction.create({
       data: { type: input.type, payload, summary: `Mark ${label} ${input.status.toLowerCase()}${tracking ? ` (${tracking})` : ""}` },
     });
-    return { ok: true, actionId: pa.id, type: input.type, title: pa.summary, details };
+    const VERB = { NEW: ["Mark not started", "Marked not started"], PACKING: ["Mark packing", "Marked packing"], SHIPPED: ["Mark shipped", "Marked shipped"], DELIVERED: ["Mark delivered", "Marked delivered"] } as const;
+    return { ok: true, actionId: pa.id, type: input.type, title: pa.summary, details, confirmLabel: VERB[input.status][0], doneLabel: VERB[input.status][1] };
   }
 
   // create_invoice: every amount from the DB, never from the model.
@@ -147,15 +149,15 @@ export async function proposeAction(input: Proposal): Promise<ActionCard> {
     note: input.note ?? null,
   };
   const details = [
-    `To: ${name} <${email}>${customer ? "" : " (new customer)"} · ${country}`,
-    ...priced.lines.map((l) => `${l.name} (${l.packSize}) × ${l.quantity} = ${formatUSD(l.lineCents)}${l.note ? ` · ${l.note}` : ""}`),
+    `To ${name}, ${email}${customer ? "" : " (new customer)"}, ${country}`,
+    ...priced.lines.map((l) => `${l.name} (${l.packSize}) × ${l.quantity} = ${formatUSD(l.lineCents)}${l.note ? ` (${l.note})` : ""}`),
     `Shipping: ${quote.freeShipping ? "FREE" : formatUSD(quote.shippingCents)}`,
     `Total: ${formatUSD(quote.totalCents)} USD (prices from the shop database)`,
   ];
   const pa = await db.pendingAction.create({
     data: { type: input.type, payload, summary: `Send a PayPal invoice for ${formatUSD(quote.totalCents)} to ${email}` },
   });
-  return { ok: true, actionId: pa.id, type: input.type, title: pa.summary, details, totalCents: quote.totalCents };
+  return { ok: true, actionId: pa.id, type: input.type, title: pa.summary, details, totalCents: quote.totalCents, confirmLabel: "Send invoice", doneLabel: "Invoice sent" };
 }
 
 // ---------- Execution (Confirm button only) ----------

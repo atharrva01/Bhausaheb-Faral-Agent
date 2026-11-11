@@ -49,15 +49,15 @@ export default function CheckoutView() {
   const [submitting, setSubmitting] = useState(false);
   const [created, setCreated] = useState<{ key: string; result: CheckoutResult } | null>(null);
 
-  if (!cart) return <p className="mx-auto max-w-[1280px] px-4 py-16 text-pencil">Reading your bill…</p>;
+  if (!cart) return <p className="mx-auto max-w-[1320px] px-4 py-16 text-muted">Reading your cart…</p>;
 
   if (cart.lines.length === 0) {
     return (
       <div className="mx-auto max-w-[640px] px-4 py-14">
-        <h1 className="type-title text-[30px] sm:text-[40px]">Your bill</h1>
-        <p className="mt-3 text-lg">Nothing on the bill yet. Tell the counter what you&apos;d like, or add packets from today&apos;s rates.</p>
-        <Link href="/" className="mt-6 inline-flex h-12 items-center rounded-[4px] border-[1.5px] border-ink px-5 font-semibold hover:bg-paper">
-          Go to today&apos;s rates
+        <h1 className="type-title text-[30px] sm:text-[40px]">Your cart is empty</h1>
+        <p className="mt-3 text-lg text-muted">Tell Aai what you&apos;d like in the chat, or tap Add to cart on any faral.</p>
+        <Link href="/" className="mt-6 inline-flex h-12 items-center rounded-[6px] bg-cta px-5 font-semibold text-ink hover:bg-cta-hi">
+          Shop the faral
         </Link>
       </div>
     );
@@ -123,7 +123,7 @@ export default function CheckoutView() {
 
   const field = (name: keyof Details, label: string, props: React.InputHTMLAttributes<HTMLInputElement> = {}) => (
     <div>
-      <label htmlFor={`f-${name}`} className="mb-1 block text-[15px] font-semibold">
+      <label htmlFor={`f-${name}`} className="mb-1 block text-[15px] font-semibold text-ink">
         {label}
       </label>
       <input
@@ -134,10 +134,10 @@ export default function CheckoutView() {
         onChange={(e) => update(name, e.target.value)}
         aria-invalid={!!fieldErrors[name]}
         aria-describedby={fieldErrors[name] ? `e-${name}` : undefined}
-        className={`h-12 w-full rounded-[3px] border-[1.5px] bg-paper px-3 text-base ${fieldErrors[name] ? "border-khata" : "border-pencil"}`}
+        className={`h-12 w-full rounded-[8px] border bg-card px-3 text-base text-ink placeholder:text-mutedd ${fieldErrors[name] ? "border-danger" : "border-line"}`}
       />
       {fieldErrors[name] && (
-        <p id={`e-${name}`} className="mt-1 text-[15px] text-khata">
+        <p id={`e-${name}`} className="mt-1 text-[15px] text-danger">
           {fieldErrors[name]}
         </p>
       )}
@@ -146,11 +146,6 @@ export default function CheckoutView() {
 
   const pay = (
     <div className="space-y-3">
-      {fieldErrors.form && (
-        <p role="alert" className="text-[15px] text-khata">
-          {fieldErrors.form}
-        </p>
-      )}
       {checkout ? (
         <PayPalCheckout {...checkout} />
       ) : (
@@ -158,27 +153,27 @@ export default function CheckoutView() {
           type="submit"
           form="parcel-form"
           disabled={submitting || busy || !quote}
-          className="h-12 w-full rounded-[4px] bg-stamp px-4 text-base font-semibold text-paper hover:bg-[#3f3168] disabled:bg-pencil/60"
+          className="h-12 w-full rounded-[6px] bg-cta px-4 text-base font-semibold text-ink hover:bg-cta-hi disabled:bg-pencil/40 disabled:text-ink"
         >
-          {!quote ? "Choose where it's going" : submitting ? "Writing your bill…" : "Make my bill"}
+          {!quote ? "Choose where it's going" : submitting ? "Preparing PayPal…" : "Continue to payment"}
         </button>
       )}
     </div>
   );
 
   return (
-    <div className="mx-auto w-full max-w-[1280px] px-4 pb-16 pt-7 sm:px-6 lg:pt-9">
-      <h1 className="type-title text-[30px] leading-[1.1] sm:text-[40px]">Your bill</h1>
-      <p className="mt-2 text-lg">Check the packets, tell us where the parcel goes, then pay with PayPal.</p>
+    <div className="mx-auto w-full max-w-[1320px] px-4 pb-16 pt-7 sm:px-6 lg:pt-9">
+      <h1 className="type-title text-[30px] leading-[1.1] sm:text-[40px]">Checkout</h1>
+      <p className="mt-2 text-lg text-muted">Check your packets, tell us where the parcel goes, then pay with PayPal.</p>
 
-      {cartError && <p role="alert" className="mt-3 text-khata">{cartError}</p>}
+      {cartError && <p role="alert" className="mt-3 text-danger">{cartError}</p>}
 
       <div className="mt-7 grid grid-cols-1 gap-x-10 gap-y-9 lg:grid-cols-12">
         {/* The bill: first on phones, sticky on the right on desktop. */}
         <div className="min-w-0 lg:col-span-5 lg:col-start-8 lg:row-start-1">
           <div className="lg:sticky lg:top-6">
             <Bill
-              label="Your bill"
+              label="Order summary"
               number={checkout ? checkout.orderNumber.replace("#", "") : null}
               lines={bill.lines}
               postage={bill.postage}
@@ -202,8 +197,8 @@ export default function CheckoutView() {
 
         <form id="parcel-form" onSubmit={makeBill} noValidate className="min-w-0 lg:col-span-6 lg:row-start-1">
           <fieldset>
-            <legend className="type-head w-full border-b-2 border-ink pb-2 text-2xl">Where is the parcel going?</legend>
-            <div className="mt-4 grid grid-cols-2 overflow-hidden rounded-[3px] border-[1.5px] border-ink sm:grid-cols-5" role="radiogroup" aria-label="Country">
+            <legend className="type-head w-full pb-1 text-2xl">1. Where is the parcel going?</legend>
+            <div className="mt-3 grid grid-cols-2 overflow-hidden rounded-[8px] border border-line sm:grid-cols-5" role="radiogroup" aria-label="Country">
               {SUPPORTED_COUNTRIES.map((c, i) => (
                 <button
                   key={c}
@@ -212,8 +207,8 @@ export default function CheckoutView() {
                   aria-checked={country === c}
                   onClick={() => setCountry(c)}
                   disabled={busy}
-                  className={`h-12 border-ink px-2 text-[15px] font-semibold ${i > 0 ? "sm:border-l-[1.5px]" : ""} ${i % 2 === 1 ? "border-l-[1.5px]" : ""} ${i >= 2 ? "border-t-[1.5px] sm:border-t-0" : ""} ${
-                    country === c ? "bg-ink text-paper" : "bg-paper hover:bg-wall"
+                  className={`h-12 border-line px-2 text-[15px] font-semibold ${i > 0 ? "sm:border-l" : ""} ${i % 2 === 1 ? "border-l" : ""} ${i >= 2 ? "border-t sm:border-t-0" : ""} ${
+                    country === c ? "bg-cta text-ink" : "bg-card text-ink hover:bg-soft"
                   } ${i === 4 ? "col-span-2 sm:col-span-1" : ""}`}
                 >
                   {SHIPPING_RATES[c].name === "United States" ? "United States" : SHIPPING_RATES[c].short}
@@ -222,7 +217,8 @@ export default function CheckoutView() {
             </div>
           </fieldset>
 
-          <div className="mt-7 grid gap-5 sm:grid-cols-2">
+          <h2 className="type-head mt-8 text-2xl">2. Delivery address</h2>
+          <div className="mt-3 grid gap-5 sm:grid-cols-2">
             <div className="sm:col-span-2">{field("name", "Name on the parcel", { autoComplete: "name", required: true })}</div>
             <div className="sm:col-span-2">{field("email", "Email for the tracking number", { type: "email", autoComplete: "email", required: true })}</div>
             <div className="sm:col-span-2">{field("line1", "House and street", { autoComplete: "address-line1", required: true })}</div>
@@ -240,7 +236,12 @@ export default function CheckoutView() {
               {field("giftMessage", "A note to tuck in the parcel (optional)", { maxLength: 200, placeholder: "Happy Diwali, Aai-Baba" })}
             </div>
           </div>
-          <p className="mt-3 text-[15px] text-pencil">We&apos;ll remember this address on this device.</p>
+          <p className="mt-3 text-[15px] text-muted">We&apos;ll remember this address on this device.</p>
+          {fieldErrors.form && (
+            <p role="alert" className="mt-4 rounded-[8px] border border-danger/60 bg-soft p-3 text-[15px] text-danger">
+              {fieldErrors.form}
+            </p>
+          )}
 
           {/* Phones/tablets: pay under the form. */}
           <div className="mt-7 lg:hidden">{pay}</div>

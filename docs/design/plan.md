@@ -392,3 +392,26 @@ What still carries some risk, and how it's held in check:
 7. Steel-taat illustrations + image manifest.
 8. Mobile pass at 390, 768, 1024, 1440; focus states; reduced motion; contrast re-check.
 9. After screenshots in `docs/design/screenshots/after/`, grep check, end-to-end tests of both flows.
+
+---
+
+## 11. Revision 2 (client review, built): light marketplace, new chat
+
+The first build (§1–§10, "the counter and the bill") was reviewed by the client mid-build. Their feedback, in order:
+1. The distemper-green and then the Diwali-night palettes: *"didn't love the colour theme"*, *"violet doesn't look good"*.
+2. Layout: keep a split/visual storefront, *"make it like Amazon, Flipkart"*.
+3. *"The chat thing should be different."* Use senior UI/UX judgement.
+
+What shipped, and why:
+
+| Area | Revision 2 | Why |
+|---|---|---|
+| **Palette** | Light page `#f4f3ef`, white cards, **mango-leaf green** brand `#144a33` (header, footer, chat), **turmeric** buttons `#ffc52e` with ink text, green accent `#17603f`, danger `#b42318`. Paper zone kept for the bill. | Light, trustworthy, festive (mango-leaf toran + turmeric), no violet anywhere. Contrast: ink on page 15.5:1, ink on turmeric 10.9:1, white on brand 10.2:1, accent on white 7.6:1, danger 6.6:1. |
+| **Stamp** | The shop stamp is now **green** "पैसे मिळाले" in the bill's signature space (सही). | Violet was rejected; green reads as "paid" and matches the brand. |
+| **Layout** | Marketplace header (wordmark, *Deliver to* country select wired to the cart, search, Ask Aai, cart with count + total), category tabs (All / Sweet / Savoury, server-side via `?c=`), search via `?q=`, Diwali banner with the **Ask bar**, a 4-column product grid (2 on phones) with big turmeric *Add to cart* that becomes a − n + stepper, a trust strip, a green footer. | Familiar Amazon/Flipkart patterns the client asked for; search and categories are presentation-only (no business-logic change). |
+| **Badges** | "Bestseller this week" from the last 7 days of **real paid orders**; "Only n left" from stock. No star ratings. | No fabricated reviews or ratings. |
+| **Chat** | **"Ask Aai"**: an assistant slide-over from the right (full screen on phones), opened from the header, the banner's ask bar (sends the typed message), or the phone bottom bar. Aai avatar, white assistant bubbles, green customer bubbles, quick-reply chips, plain-word progress lines ("Working out postage to United States…"), **cart cards** with a Checkout button, PayPal inside a payment card, a pinned cart bar. One shared conversation across pages. | The column counter took a third of the page permanently; a shopping-assistant drawer (like Amazon's) keeps the grid full width while making the chat one tap away from anywhere, with a typed-question entry right in the banner. |
+| **Bill slip** | Kept as the signature object for checkout's order summary, the order page, the 404 joke and the owner's order drawer. | It's the one thing in the app that could only belong to this shop. |
+| **Owner** | Green bar, English/मराठी switch (all labels + the AI note + dates), "To make and pack" first (batch totals per faral + one big button per parcel), "Needs a look", "Aai's note for today", the khata (AG Grid in the light theme, stamp-style status labels, native one-tap status select), approval slips in Ask with verb buttons ("Mark shipped" → "Marked shipped", "Send invoice" → "Invoice sent") and the green stamp "नोंद केली". | Unchanged structure from §4.6–4.8, recoloured. |
+
+Dropped from Revision 1: the khata-red painted signboard header, the rate-board list (replaced by the grid), the counter column, the steel/green and night grounds.

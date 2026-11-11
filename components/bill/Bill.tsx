@@ -69,7 +69,7 @@ export function Bill({
   const showHead = letterhead ?? !compact;
   return (
     <div className={`slip-wrap relative ${animateIn ? "anim-slip-out" : ""} ${className}`}>
-      <section className={`slip relative ${compact ? "pb-3" : "pb-5"}`} aria-label={label}>
+      <section className={`slip on-paper relative ${compact ? "pb-3" : "pb-5"}`} aria-label={label}>
         {/* Letterhead, printed in khata red. Compact strips (chat copies) skip it: the running bill carries it. */}
         {showHead && (
         <header className={`${pad} flex items-start justify-between gap-3 border-b-2 border-khata pb-2`}>

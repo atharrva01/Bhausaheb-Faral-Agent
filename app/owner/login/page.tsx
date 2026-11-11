@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { LoginForm } from "./LoginForm";
+import { OWNER_LANG_COOKIE, ownerDict, parseOwnerLang } from "@/lib/owner/i18n";
 
-export const metadata: Metadata = { title: "Owner login · Bhausaheb Faral" };
+export const metadata: Metadata = { title: "Shop side · Bhausaheb Faral" };
 
 export default async function OwnerLoginPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
   const { next } = await searchParams;
+  const t = ownerDict(parseOwnerLang((await cookies()).get(OWNER_LANG_COOKIE)?.value));
   return (
-    <main className="flex flex-1 items-center justify-center px-4 py-16">
-      <div className="w-full max-w-sm rounded-2xl border border-line bg-white p-6 shadow-sm">
-        <p className="text-sm font-semibold uppercase tracking-widest text-saffron">Bhausaheb Faral</p>
-        <h1 className="mt-1 font-display text-3xl text-maroon">Owner dashboard</h1>
-        <p className="mb-6 mt-1 text-sm text-muted">Orders, packing list and Aai&apos;s assistant.</p>
-        <LoginForm next={next ?? "/owner"} />
-      </div>
+    <main className="mx-auto w-full max-w-[420px] flex-1 px-4 py-14">
+      <h1 className="type-title text-[30px] sm:text-[40px]">{t.loginTitle}</h1>
+      <p className="mb-7 mt-2 text-lg">{t.loginHelp}</p>
+      <LoginForm next={next ?? "/owner"} />
     </main>
   );
 }

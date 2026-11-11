@@ -28,3 +28,8 @@ export async function logout() {
   (await cookies()).delete(OWNER_COOKIE);
   redirect("/owner/login");
 }
+
+/** English / मराठी switch for the shop side. */
+export async function setOwnerLang(lang: "en" | "mr") {
+  (await cookies()).set("owner_lang", lang === "mr" ? "mr" : "en", { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
+}

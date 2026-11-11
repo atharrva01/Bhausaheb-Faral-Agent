@@ -2,15 +2,26 @@ import Link from "next/link";
 
 export function SiteFooter() {
   return (
-    <footer className="mt-auto border-t-2 border-ink pb-28 pt-6 text-[15px] text-pencil lg:pb-8">
-      <div className="mx-auto flex max-w-[1280px] flex-col gap-3 px-4 sm:px-6 md:flex-row md:justify-between">
-        <div className="space-y-0.5">
-          <p>Bhausaheb General Kirana Stores, opposite the bus depot, Karjat, Raigad, Maharashtra.</p>
-          <p>Rates in US dollars. Payments through PayPal (sandbox for this demo).</p>
+    <footer className="mt-auto bg-brand pb-24 pt-8 text-[15px] text-white/85 sm:pb-8">
+      <div className="mx-auto grid max-w-[1320px] gap-6 px-4 sm:grid-cols-3 sm:px-6">
+        <div>
+          <p lang="mr" className="type-sign text-xl text-cta">भाऊसाहेब फराळ</p>
+          <p className="mt-1">Bhausaheb General Kirana Stores, opposite the bus depot, Karjat, Raigad, Maharashtra.</p>
         </div>
-        <nav aria-label="Footer" className="flex gap-5">
-          <Link href="/about" className="underline-offset-4 hover:underline">Our story</Link>
-          <Link href="/owner" className="underline-offset-4 hover:underline">Shop side</Link>
+        <div>
+          <p className="font-semibold text-white">Ordering</p>
+          <ul className="mt-1 space-y-1">
+            <li>Prices in US dollars, postage added at checkout.</li>
+            <li>Payments through PayPal (sandbox for this demo).</li>
+          </ul>
+        </div>
+        <nav aria-label="Footer">
+          <p className="font-semibold text-white">Shop</p>
+          <ul className="mt-1 space-y-1">
+            <li><Link href="/about" className="hover:text-white hover:underline">Our story</Link></li>
+            <li><Link href="/checkout" className="hover:text-white hover:underline">Your cart</Link></li>
+            <li><Link href="/owner" className="hover:text-white hover:underline">Shop side login</Link></li>
+          </ul>
         </nav>
       </div>
     </footer>

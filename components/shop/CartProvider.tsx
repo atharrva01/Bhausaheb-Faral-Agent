@@ -15,6 +15,9 @@ type CartContextValue = {
 
 const CartContext = createContext<CartContextValue | null>(null);
 
+/** Fired when something other than this provider (the counter's agent) changed the server cart. */
+export const CART_CHANGED_EVENT = "bf:cart-changed";
+
 export function useCart() {
   const ctx = useContext(CartContext);
   if (!ctx) throw new Error("useCart must be used inside <CartProvider>");
@@ -60,6 +63,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       alive = false;
     };
   }, []);
+
+  useEffect(() => {
+    const onChanged = () => void run();
+    window.addEventListener(CART_CHANGED_EVENT, onChanged);
+    return () => window.removeEventListener(CART_CHANGED_EVENT, onChanged);
+  }, [run]);
 
   const value: CartContextValue = {
     cart,
